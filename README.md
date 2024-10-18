@@ -1,10 +1,11 @@
 # Multimodal Emotion-Cause Pair Extraction in Conversations
 
-This repository provides the working code for the paper: [Multimodal Emotion-Cause Pair Extraction in Conversations](https://arxiv.org/pdf/2110.08020).
+This repository aims to provide the working code for the paper: [Multimodal Emotion-Cause Pair Extraction in Conversations](https://arxiv.org/pdf/2110.08020).
 
 ## Introduction
 
 The goal of this project is to extract emotion-cause pairs in conversations using multimodal data including text, audio, and video. The code is based on the methodologies described in the paper.
+Emotions included are Anger, Disgust, Sadness, Joy, Neutral, Surprise and Fear.
 
 ## Dataset
 
