@@ -31,7 +31,3 @@ We use the ECF dataset for this project, which includes the Emotion-Cause Pairs 
 
 1. Extract features from the dataset using OpenSMILE for audio, 3D-CNN for video, and BERT for text.
 2. Preprocess the data and generate the embeddings.
-
-## Citation
-
-If you use this code, please cite the following paper:
