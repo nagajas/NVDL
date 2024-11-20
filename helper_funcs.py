@@ -181,3 +181,37 @@ def load_data(input_file, word_idx, video_idx, spe_idx, max_doc_len, max_sen_len
             x_v_tmp = np.zeros(max_doc_len, dtype=np.int32)
             sen_len_tmp = np.zeros(max_doc_len, dtype=np.int32)
             spe_tmp = np.zeros(max_doc_len, dtype=np.int32)
+    # Process each sentence in the document
+            for i in range(d_len):
+                line = file.readline().strip().split(' | ')
+                x_v_tmp[i] = video_idx.get(f'dia{d_id}utt{i + 1}', 0)
+
+                # Process speaker
+                speaker_name = line[1]
+                if speaker_name in spe_idx:
+                    spe_tmp[i] = spe_idx[speaker_name]
+                #else:
+                   #print(f'Warning: Speaker "{speaker_name}" not found in index.')
+
+                # Process emotion label
+                emotion = line[2]
+                y_emotion_tmp[i] = [1, 0] if emotion == 'neutral' else [0, 1]
+                num_emo += (emotion != 'neutral')
+
+                # Process cause label
+                cause = [p[1] for p in pairs if p[0] == i + 1]
+                y_cause_tmp[i][int(len(cause) > 0)] = 1
+
+                # Process words in the sentence
+                words = line[3].replace('|', '').split()
+                sen_len_tmp[i] = min(len(words), max_sen_len)
+                for j, word in enumerate(words[:max_sen_len]):
+                    x_tmp[i][j] = word_idx.get(word, 0)
+
+            # Append document data
+            y_emotion.append(y_emotion_tmp)
+            y_cause.append(y_cause_tmp)
+            x.append(x_tmp)
+            x_v.append(x_v_tmp)
+            sen_len.append(sen_len_tmp)
+            speaker.append(spe_tmp)
