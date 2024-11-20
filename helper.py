@@ -256,7 +256,7 @@ def load_pairs(file, pred_future_cause):
         pairs = sorted(set(pairs))  # Remove duplicates
     return pairs
 
-def load_data_utt_step2(input_file, word_to_idx, video_to_idx, max_sentence_length=45, pred_future_cause=1):
+def load_data_2(input_file, word_to_idx, video_to_idx, max_sentence_length=45, pred_future_cause=1):
     #print(f"\nLoading data from file: {input_file}\n")
     
     max_doc_length = 35
