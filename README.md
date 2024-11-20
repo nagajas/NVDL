@@ -80,8 +80,8 @@ Key components:
 | **File Name**        | **Description**                              |
 |-----------------------|----------------------------------------------|
 | `helper.py` | Functions Defined which will be used for training |
-<!-- | `model.py`           | Implements the MECPE model architecture.    |
-| `train.py`           | Contains the training loop and evaluation metrics. | -->
+| `pair.py`           | Extracction of the emotion cause pairs    |
+| `BiLSTM_EC.py`           | Emotion & Cause utterances extractions using separate BiLSTMs |
 
 <!-- *(Add more rows as needed.)* -->
 
@@ -91,13 +91,15 @@ Key components:
 
 Experimental evaluations demonstrate the effectiveness of the MECPE model using multimodal features. Key observations:
 - Introducing audio and video features significantly improves recall.
-- The BERT-based model outperforms LSTM on text-only settings but gains marginal improvements with additional modalities.
+<!-- - The BERT-based model outperforms LSTM on text-only settings but gains marginal improvements with additional modalities. -->
 
+![results](results.png)
+<!-- 
 | **Task**       | **Precision** | **Recall** | **F1-Score** |
 |----------------|---------------|------------|--------------|
 | Emotion Detection  | 77.1%         | 81.5%      | 79.1%        |
 | Cause Detection    | 67.9%         | 73.6%      | 70.1%        |
-| Pair Extraction    | 57.4%         | 52.2%      | 54.5%        |
+| Pair Extraction    | 57.4%         | 52.2%      | 54.5%        | -->
 
 For detailed results, refer to the *Results Section* in the project report.
 
@@ -107,8 +109,9 @@ For detailed results, refer to the *Results Section* in the project report.
 
 - **Team Members**: Team NVDL  
 - **Contributions**:  
-  - **[Your Name]**: Model architecture and implementation.  
-  - **[Team Member 2]**: Dataset preprocessing and feature extraction.  
-  - **[Team Member 3]**: Experimental design and result analysis.  
-
+  - **[Naga Jaswanth]**: Model architecture and implementation.  
+  - **[Sai Surya]**: Deployment and Video Feature Extraction.  
+  - **[Munjam Navadeep]**: Deployment and Video Feature Extraction.  
+  - **[Siri]**: Text Feature Extraction and Helper Functions.  
+  - **[Veda Sri]**: Text Feature Extraction and Helper Functions.
 ---
