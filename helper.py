@@ -2,6 +2,7 @@ import random
 import numpy as np
 import pickle
 import json
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
@@ -225,3 +226,98 @@ def calculate_metrics(y_true, y_pred):
     acc = accuracy_score(y_true, y_pred)
     prec = precision_score(y_true, y_pred, average='macro')
     return f1, acc, prec
+
+import numpy as np
+
+def tokenize_sentence(sentence, word_to_idx, max_len):
+    """
+    Tokenize a sentence into a sequence of word indices.
+    """
+    tokens = sentence.split()
+    token_ids = [word_to_idx.get(word, 0) for word in tokens[:max_len]]  # Map to indices
+    return token_ids, len(tokens[:max_len])
+
+def read_doc_metadata(file):
+    """
+    Read document metadata such as ID and length.
+    """
+    line = file.readline().strip().split()
+    doc_id = int(line[0])
+    doc_len = int(line[1])
+    return doc_id, doc_len
+
+def load_pairs(file, pred_future_cause):
+    """
+    Load pairs of emotion-cause indices.
+    """
+    pairs = eval(file.readline().strip())
+    if pairs:
+        pairs = [(p[0], p[1]) for p in pairs if pred_future_cause or p[1] <= p[0]]
+        pairs = sorted(set(pairs))  # Remove duplicates
+    return pairs
+
+def load_data_utt_step2(input_file, word_to_idx, video_to_idx, max_sentence_length=45, pred_future_cause=1):
+    #print(f"\nLoading data from file: {input_file}\n")
+    
+    max_doc_length = 35
+    num_pairs_cut = 0
+    
+    doc_ids, sentences, sentence_lengths, distances, video_features = [], [], [], [], []
+    labels, all_pairs, valid_pairs = [], [], []
+
+    with open(input_file, 'r', encoding='utf-8') as file:
+        while True:
+            line = file.readline()
+            if not line:  # End of file
+                break
+
+            doc_id, doc_len = read_doc_metadata(file)
+            doc_ids.append(doc_id)
+
+            pairs = load_pairs(file, pred_future_cause)
+            all_pairs.extend([[doc_id, p[0], p[1]] for p in pairs])
+            
+            doc_sentences = np.zeros((max_doc_length, max_sentence_length), dtype=np.int32)
+            doc_sentence_lengths = np.zeros(max_doc_length, dtype=np.int32)
+            emotions, causes = set(), set()
+
+            for i in range(doc_len):
+                line = file.readline().strip().split(" | ")
+                sentence_text, is_emotion, is_cause = line[5], int(line[1]), int(line[2])
+                
+                if is_emotion > 0:
+                    emotions.add(i + 1)
+                if is_cause > 0:
+                    causes.add(i + 1)
+                
+                # Tokenize 
+                tokens, length = tokenize_sentence(sentence_text, word_to_idx, max_sentence_length)
+                doc_sentences[i, :len(tokens)] = tokens
+                doc_sentence_lengths[i] = length
+
+            # Generate valid pairs
+            for emotion_idx in emotions:
+                for cause_idx in causes:
+                    if pred_future_cause or emotion_idx >= cause_idx:
+                        valid_pairs.append([doc_id, emotion_idx, cause_idx])
+                        sentences.append([doc_sentences[emotion_idx - 1], doc_sentences[cause_idx - 1]])
+                        sentence_lengths.append([doc_sentence_lengths[emotion_idx - 1], doc_sentence_lengths[cause_idx - 1]])
+                        distances.append(cause_idx - emotion_idx + 100)
+                        labels.append([0, 1] if [doc_id, emotion_idx, cause_idx] in all_pairs else [1, 0])
+                        video_features.append([
+                            video_to_idx.get(f'dia{doc_id}utt{emotion_idx}', 0),
+                            video_to_idx.get(f'dia{doc_id}utt{cause_idx}', 0),
+                        ])
+
+    sentences = np.array(sentences)
+    sentence_lengths = np.array(sentence_lengths)
+    distances = np.array(distances)
+    video_features = np.array(video_features)
+    labels = np.array(labels)
+
+    # print(f"Sentences shape: {sentences.shape}")
+    # print(f"Labels shape: {labels.shape}")
+    # print(f"Total pairs: {len(all_pairs)}, Valid pairs: {len(valid_pairs)}, Truncated pairs: {num_pairs_cut}")
+    # print(f"Data loading completed!\n")
+
+    return sentences, sentence_lengths, distances, video_features, labels, all_pairs, valid_pairs, doc_ids
