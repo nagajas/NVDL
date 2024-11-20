@@ -5,6 +5,10 @@ import json
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
+from sklearn.metrics import f1_score
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+
 def load_pickle_data(filename):
     with open(filename, 'rb') as f:
         data = pickle.load(f)
@@ -131,3 +135,49 @@ def adjust_sequence_length(sequences, max_utt, segment_indices, max_sen_len):
         mask[:segment_indices[max_sen_len]] = 1
 
     return sequences[:max_utt], mask, segment_indices
+def load_data(input_file, word_idx, video_idx, spe_idx, max_doc_len, max_sen_len):
+    """
+    Load and process data for BiLSTM with speaker information.
+
+    Args:
+        input_file (str): Path to the input file.
+        word_idx (dict): Mapping of words to indices.
+        video_idx (dict): Mapping of video IDs to indices.
+        spe_idx (dict): Mapping of speakers to indices.
+        max_doc_len (int): Maximum number of utterances in a document.
+        max_sen_len (int): Maximum number of tokens in a sentence.
+
+    Returns:
+        tuple: Processed data arrays and metadata.
+    """
+   # print(f'\nLoading data from: {input_file}\n')
+
+    doc_id, y_emotion, y_cause, x, x_v, sen_len, doc_len, speaker, y_pairs, num_token = [[] for _ in range(10)]
+    num_emo, num_pairs = 0, 0
+
+    with open(input_file, 'r', encoding='utf-8') as file:
+        while True:
+            line = file.readline()
+            if not line:
+                break
+
+            # Process document-level metadata
+            line = line.strip().split()
+            d_id, d_len = line[0], int(line[1])
+            doc_id.append(d_id)
+            doc_len.append(d_len)
+
+            # Process emotion-cause pairs
+            pairs = eval('[' + file.readline().strip() + ']')
+            if pairs:
+                pairs = sorted(list(set(pairs)))
+                y_pairs.append(pairs)
+                num_pairs += len(pairs)
+
+            # Initialize arrays for the document
+            y_emotion_tmp = np.zeros((max_doc_len, 2))  # Binary emotion labels
+            y_cause_tmp = np.zeros((max_doc_len, 2))    # Binary cause labels
+            x_tmp = np.zeros((max_doc_len, max_sen_len), dtype=np.int32)
+            x_v_tmp = np.zeros(max_doc_len, dtype=np.int32)
+            sen_len_tmp = np.zeros(max_doc_len, dtype=np.int32)
+            spe_tmp = np.zeros(max_doc_len, dtype=np.int32)
