@@ -33,3 +33,19 @@ def load_glove(embedding_path):
             w2v[word] = embedding
     #print(f'{len(w2v)} words loaded from glove')
     return w2v
+def init_embs(words, w2v, embedding_dim):
+    # Initialize embedding matrix
+    embedding_matrix = [np.zeros(embedding_dim)]  # Add zero vector for padding
+    for word in words:
+        if word in w2v:
+            embedding_matrix.append(w2v[word])
+        else:
+            embedding_matrix.append(np.random.uniform(-0.1, 0.1, embedding_dim))
+    #print(f'{len(embedding_matrix)} words have embeddings')
+    return np.array(embedding_matrix)
+
+def init_pos_embs(embedding_dim_pos, max_position=200):
+    # Pos embeddings random init
+    embedding_pos = [np.zeros(embedding_dim_pos)]
+    embedding_pos.extend(np.random.normal(0.0, 0.1, (max_position, embedding_dim_pos)))
+    return np.array(embedding_pos)
