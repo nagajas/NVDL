@@ -215,3 +215,9 @@ def load_data(input_file, word_idx, video_idx, spe_idx, max_doc_len, max_sen_len
             x_v.append(x_v_tmp)
             sen_len.append(sen_len_tmp)
             speaker.append(spe_tmp)
+# Convert lists to numpy arrays
+    x, x_v, sen_len, doc_len, speaker, y_emotion, y_cause = map(
+        np.array, [x, x_v, sen_len, doc_len, speaker, y_emotion, y_cause]
+    )
+
+    return x, x_v, sen_len, doc_len, speaker, y_emotion, y_cause, doc_id, y_pairs
