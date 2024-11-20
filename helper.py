@@ -174,14 +174,14 @@ def load_data(input_file, word_idx, video_idx, spe_idx, max_doc_len, max_sen_len
                 y_pairs.append(pairs)
                 num_pairs += len(pairs)
 
-            # Initialize arrays for the document
             y_emotion_tmp = np.zeros((max_doc_len, 2))  # Binary emotion labels
             y_cause_tmp = np.zeros((max_doc_len, 2))    # Binary cause labels
             x_tmp = np.zeros((max_doc_len, max_sen_len), dtype=np.int32)
             x_v_tmp = np.zeros(max_doc_len, dtype=np.int32)
             sen_len_tmp = np.zeros(max_doc_len, dtype=np.int32)
             spe_tmp = np.zeros(max_doc_len, dtype=np.int32)
-    # Process each sentence in the document
+
+
             for i in range(d_len):
                 line = file.readline().strip().split(' | ')
                 x_v_tmp[i] = video_idx.get(f'dia{d_id}utt{i + 1}', 0)
@@ -190,8 +190,6 @@ def load_data(input_file, word_idx, video_idx, spe_idx, max_doc_len, max_sen_len
                 speaker_name = line[1]
                 if speaker_name in spe_idx:
                     spe_tmp[i] = spe_idx[speaker_name]
-                #else:
-                   #print(f'Warning: Speaker "{speaker_name}" not found in index.')
 
                 # Process emotion label
                 emotion = line[2]
@@ -208,16 +206,22 @@ def load_data(input_file, word_idx, video_idx, spe_idx, max_doc_len, max_sen_len
                 for j, word in enumerate(words[:max_sen_len]):
                     x_tmp[i][j] = word_idx.get(word, 0)
 
-            # Append document data
             y_emotion.append(y_emotion_tmp)
             y_cause.append(y_cause_tmp)
             x.append(x_tmp)
             x_v.append(x_v_tmp)
             sen_len.append(sen_len_tmp)
             speaker.append(spe_tmp)
-# Convert lists to numpy arrays
+
     x, x_v, sen_len, doc_len, speaker, y_emotion, y_cause = map(
         np.array, [x, x_v, sen_len, doc_len, speaker, y_emotion, y_cause]
     )
 
     return x, x_v, sen_len, doc_len, speaker, y_emotion, y_cause, doc_id, y_pairs
+
+
+def calculate_metrics(y_true, y_pred):
+    f1 = f1_score(y_true, y_pred, average='macro')
+    acc = accuracy_score(y_true, y_pred)
+    prec = precision_score(y_true, y_pred, average='macro')
+    return f1, acc, prec
