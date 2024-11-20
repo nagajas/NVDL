@@ -76,3 +76,8 @@ def normalize_embeddings(embeddings):
     data = (data - min_vals) / (max_vals - min_vals + 1e-8)
     embeddings[1:, :] = data
     return embeddings
+
+def load_mapping(mapping_file):
+    # Load mapping
+    mapping = np.load(mapping_file, allow_pickle=True).item()
+    return mapping
