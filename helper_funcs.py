@@ -102,3 +102,32 @@ def load_video_audio_embeddings(video_mapping_file, video_emb_file, audio_emb_fi
     # print(f"Loaded audio embeddings: {audio_emb_file}, shape: {audio_embeddings.shape}\n")
 
     return video_id_mapping, video_embeddings, audio_embeddings
+def adjust_sequence_length(sequences, max_utt, segment_indices, max_sen_len):
+    # Adjust sequence length
+    # Conditions: max 35 words per utterance, max 35 utterances per dialogue
+    if segment_indices[max_sen_len] > max_utt:
+        segment_indices = np.array(segment_indices)
+        clause_max_utt = max_utt // max_sen_len
+        new_segment_indices = np.zeros_like(segment_indices)
+        adjusted_sequences = np.zeros_like(sequences)
+        mask = np.zeros_like(sequences, dtype=int)
+        
+        pos = 0
+        for i in range(max_sen_len):
+            start, end = segment_indices[i], segment_indices[i + 1]
+            segment_length = min(end - start, clause_max_utt)
+
+            adjusted_sequences[pos:pos + segment_length] = sequences[start:start + segment_length]
+            mask[pos:pos + segment_length] = 1
+            new_segment_indices[i + 1] = new_segment_indices[i] + segment_length
+            pos += segment_length
+
+        # Truncate sequences and update segment indices
+        sequences = adjusted_sequences[:max_utt]
+        mask = mask[:max_utt]
+        segment_indices = new_segment_indices.tolist()
+    else:
+        mask = np.zeros_like(sequences, dtype=int)
+        mask[:segment_indices[max_sen_len]] = 1
+
+    return sequences[:max_utt], mask, segment_indices
