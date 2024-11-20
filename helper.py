@@ -50,7 +50,7 @@ def init_embs(words, w2v, embedding_dim):
     #print(f'{len(embedding_matrix)} words have embeddings')
     return np.array(embedding_matrix)
 
-def init_pos_embs(embedding_dim_pos, max_position=200):
+def init_pos_embs(embedding_dim_pos, max_position=50):
     # Pos embeddings random init
     embedding_pos = [np.zeros(embedding_dim_pos)]
     embedding_pos.extend(np.random.normal(0.0, 0.1, (max_position, embedding_dim_pos)))
