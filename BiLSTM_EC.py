@@ -249,6 +249,11 @@ def train_model():
         p_e, r_e, f1_e = calculate_metrics(y_true_emotion, y_pred_emotion)
         p_c, r_c, f1_c = calculate_metrics(y_true_cause, y_pred_cause)
    
+        #Collect predictions
+        y_true_emotion.extend(y_emotion.cpu().numpy())
+        y_pred_emotion.extend(torch.argmax(pred_emotion, dim=1).cpu().numpy())
+        y_true_cause.extend(y_cause.cpu().numpy())
+        y_pred_cause.extend(torch.argmax(pred_cause, dim=1).cpu().numpy())
      
         print(f"Epoch {epoch+1} - Loss: {total_loss/len(train_loader):.4f}")
         print(f"Emotion - P: {p_e:.4f}, R: {r_e:.4f}, F1: {f1_e:.4f}")
