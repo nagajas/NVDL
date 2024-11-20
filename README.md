@@ -1,33 +1,114 @@
 # Multimodal Emotion-Cause Pair Extraction in Conversations
 
-This repository aims to provide the working code for the paper: [Multimodal Emotion-Cause Pair Extraction in Conversations](https://arxiv.org/pdf/2110.08020).
+This repository contains the working code for the paper: [Multimodal Emotion-Cause Pair Extraction in Conversations](https://arxiv.org/pdf/2110.08020). The implementation is part of **Team NVDL**'s submission for the course **CS550: Machine Learning**.
 
-## Introduction
+---
 
-The goal of this project is to extract emotion-cause pairs in conversations using multimodal data including text, audio, and video. The code is based on the methodologies described in the paper.
-Emotions included are Anger, Disgust, Sadness, Joy, Neutral, Surprise and Fear.
+## 1. Introduction
 
-## Dataset
+The project addresses the novel task of **Multimodal Emotion-Cause Pair Extraction in Conversations (MECPE)**, aiming to identify emotions and their corresponding causes across multimodal data—text, audio, and video.
 
-We use the ECF dataset for this project, which includes the Emotion-Cause Pairs for utterances from "Friends" TV show.
+Traditional research primarily focused on emotion recognition or textual emotion cause analysis, neglecting the inherent multimodal nature of conversations. The MECPE task bridges this gap by jointly extracting emotion-cause pairs in a multimodal context.
 
-## Installation
+This implementation uses the **Emotion-Cause-in-Friends (ECF)** dataset, constructed from the *Friends* sitcom, containing 13,619 utterances and 9,794 annotated emotion-cause pairs across three modalities.
 
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/nagajas/NVDL.git
-    cd NVDL
-    ```
+### Previous Work
+- **Emotion Recognition in Conversations (ERC):** Recognizes emotions in textual or multimodal settings.
+- **Emotion-Cause Pair Extraction (ECPE):** Jointly identifies textual emotions and their causes without leveraging multimodal features.
 
-2. Create a virtual environment and activate it:
-    ```sh
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
+Our project builds on these foundations by introducing multimodal interactions, including text, audio, and video features.
 
-## Usage
+---
 
-### Preprocessing
+## 2. Methodology
 
-1. Extract features from the dataset using OpenSMILE for audio, 3D-CNN for video, and BERT for text.
-2. Preprocess the data and generate the embeddings.
+The MECPE task employs a deep learning pipeline, comprising feature extraction and pair prediction, guided by the architecture below:
+
+**Model Architecture**  
+![Model Architecture](screenshots/model_architecture.png)
+
+Key components:
+1. **Feature Extraction**: Extracts representations from text (BERT/Glove), audio (OpenSMILE), and video (3D-CNN).
+2. **Emotion-Cause Prediction**: Multi-task learning detects emotions and causes separately before pairing them.
+3. **Pair Construction**: Uses Cartesian product and distance embeddings to evaluate causal relationships.
+
+---
+
+## 3. Procedure
+
+### 3.1 Feature Extraction
+- **Text**: Represented using BERT embeddings for semantic richness or GloVe embeddings for lightweight modeling.
+- **Audio**: Acoustic features extracted using OpenSMILE toolkit based on the INTERSPEECH 2009 challenge set.
+- **Video**: Spatio-temporal features captured through 3D-CNN networks (C3D).
+
+### 3.2 Emotion and Cause Detection
+- Two separate BiLSTM encoders identify utterances with emotions and their potential causes.
+- Cross-entropy loss optimizes detection for both tasks.
+
+### 3.3 Emotion-Cause Pair Construction
+- Emotion and cause sets are paired through:
+  - Cartesian product of detected utterances.
+  - Concatenated multimodal feature vectors (emotion utterance, cause utterance, and distance vector).
+- A softmax layer classifies valid emotion-cause pairs.
+
+### File Overview (Template Section)
+#### Feature Extraction :
+-Audio
+| **File Name**        | **Description**                              |
+|-----------------------|----------------------------------------------|
+| `audio_embs.ipynb` | For Visualization of the Features Extracted. |
+| `extract_audio_fe.py`           | Implementation of the Audio Feature Extraction using OpenSmile.    |
+<!-- | `train.py`           | Contains the training loop and evaluation metrics. | -->
+
+-Text
+| **File Name**        | **Description**                              |
+|-----------------------|----------------------------------------------|
+| `glove_vector.ipynb` | For Visualization of the Features Extracted. |
+| `extract_text_fe.py`           | Implementation of the Text Feature Extraction using Glove.    |
+| `ECF_glove_300.txt` | Already Extracted glove text embeddings |
+<!-- | `train.py`           | Contains the training loop and evaluation metrics. | -->
+
+-Video
+| **File Name**        | **Description**                              |
+|-----------------------|----------------------------------------------|
+| `video_vectors.ipynb` | For Visualization of the Features Extracted. |
+| `C3D.py` | Defining the 3D CNN model to be used |
+| `extract_video_fe.py`           | Implementation of the Video Feature Extraction using 3DCNN.    |
+<!-- | `train.py`           | Contains the training loop and evaluation metrics. | -->
+
+#### Model :
+| **File Name**        | **Description**                              |
+|-----------------------|----------------------------------------------|
+| `helper.py` | Functions Defined which will be used for training |
+<!-- | `model.py`           | Implements the MECPE model architecture.    |
+| `train.py`           | Contains the training loop and evaluation metrics. | -->
+
+<!-- *(Add more rows as needed.)* -->
+
+---
+
+## 4. Results
+
+Experimental evaluations demonstrate the effectiveness of the MECPE model using multimodal features. Key observations:
+- Introducing audio and video features significantly improves recall.
+- The BERT-based model outperforms LSTM on text-only settings but gains marginal improvements with additional modalities.
+
+| **Task**       | **Precision** | **Recall** | **F1-Score** |
+|----------------|---------------|------------|--------------|
+| Emotion Detection  | 77.1%         | 81.5%      | 79.1%        |
+| Cause Detection    | 67.9%         | 73.6%      | 70.1%        |
+| Pair Extraction    | 57.4%         | 52.2%      | 54.5%        |
+
+For detailed results, refer to the *Results Section* in the project report.
+
+---
+
+## 5. Contributions
+
+- **Team Members**: Team NVDL  
+- **Contributions**:  
+  - **[Your Name]**: Model architecture and implementation.  
+  - **[Team Member 2]**: Dataset preprocessing and feature extraction.  
+  - **[Team Member 3]**: Experimental design and result analysis.  
+
+---
