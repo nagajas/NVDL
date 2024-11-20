@@ -81,3 +81,24 @@ def load_mapping(mapping_file):
     # Load mapping
     mapping = np.load(mapping_file, allow_pickle=True).item()
     return mapping
+def load_and_normalize_embeddings(emb_file, dtype=torch.float32):
+    # Normalize embeddings
+    embeddings = torch.tensor(np.load(emb_file, allow_pickle=True), dtype=dtype)
+    embeddings = normalize_embeddings(embeddings)
+    return embeddings
+
+def load_video_audio_embeddings(video_mapping_file, video_emb_file, audio_emb_file):
+    # Load video and audio embeddings
+    #print("\nLoading embeddings...")
+
+    #Load video ID mapping
+    video_id_mapping = load_mapping(video_mapping_file)
+
+    #Load and normalize video and audio embeddings
+    video_embeddings = load_and_normalize_embeddings(video_emb_file)
+    audio_embeddings = load_and_normalize_embeddings(audio_emb_file)
+
+    # print(f"Loaded video embeddings: {video_emb_file}, shape: {video_embeddings.shape}")
+    # print(f"Loaded audio embeddings: {audio_emb_file}, shape: {audio_embeddings.shape}\n")
+
+    return video_id_mapping, video_embeddings, audio_embeddings
