@@ -94,12 +94,7 @@ Experimental evaluations demonstrate the effectiveness of the MECPE model using 
 <!-- - The BERT-based model outperforms LSTM on text-only settings but gains marginal improvements with additional modalities. -->
 
 ![results](results.png)
-<!-- 
-| **Task**       | **Precision** | **Recall** | **F1-Score** |
-|----------------|---------------|------------|--------------|
-| Emotion Detection  | 77.1%         | 81.5%      | 79.1%        |
-| Cause Detection    | 67.9%         | 73.6%      | 70.1%        |
-| Pair Extraction    | 57.4%         | 52.2%      | 54.5%        | -->
+
 
 For detailed results, refer to the *Results Section* in the project report.
 
@@ -111,7 +106,7 @@ For detailed results, refer to the *Results Section* in the project report.
 - **Contributions**:  
   - **[Naga Jaswanth]**: Model architecture and implementation.  
   - **[Sai Surya]**: Deployment and Video Feature Extraction.  
-  - **[Munjam Navadeep]**: Deployment and Video Feature Extraction.  
+  - **[Munjam Navadeep]**: 3D CNN Architecture and  Video Feature Extraction.  
   - **[Siri]**: Text Feature Extraction and Helper Functions.  
   - **[Veda Sri]**: Text Feature Extraction and Helper Functions.
 ---
